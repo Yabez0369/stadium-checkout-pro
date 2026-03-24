@@ -1,33 +1,19 @@
 import { useState, useCallback } from 'react';
 import {
-  POSScreen,
-  SaleState,
-  CartItem,
-  Product,
-  createEmptySale,
-  generateTransactionId,
-  getCartTotal,
-  PRODUCTS,
+  POSScreen, SaleState, CartItem, Product,
+  createEmptySale, generateTransactionId, getCartTotal,
 } from '@/data/posProducts';
 
-import ReadyScreen from './ReadyScreen';
-import ProductScreen from './ProductScreen';
-import CartSidebar from './CartSidebar';
-import CartReviewScreen from './CartReviewScreen';
-import CustomerAttachScreen from './CustomerAttachScreen';
-import SaleActionsScreen from './SaleActionsScreen';
+import ScanScreen from './ScanScreen';
 import TenderScreen from './TenderScreen';
 import CashPaymentScreen from './CashPaymentScreen';
 import CardPaymentScreen from './CardPaymentScreen';
 import SplitTenderScreen from './SplitTenderScreen';
-import PaymentSuccessScreen from './PaymentSuccessScreen';
-
-const CASHIER_NAME = 'Alex Thompson';
+import ReceiptScreen from './ReceiptScreen';
 
 export default function POSTerminal() {
-  const [screen, setScreen] = useState<POSScreen>('ready');
+  const [screen, setScreen] = useState<POSScreen>('scanning');
   const [sale, setSale] = useState<SaleState>(createEmptySale());
-  const [activeCategory, setActiveCategory] = useState('all');
 
   const updateSale = useCallback((updates: Partial<SaleState>) => {
     setSale(prev => ({ ...prev, ...updates }));
@@ -46,10 +32,7 @@ export default function POSTerminal() {
       }
       const newItem: CartItem = {
         id: `ci-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-        product,
-        selectedVariant: variant,
-        quantity: 1,
-        lineDiscount: 0,
+        product, selectedVariant: variant, quantity: 1, lineDiscount: 0,
       };
       return { ...prev, cart: [...prev.cart, newItem] };
     });
@@ -74,92 +57,26 @@ export default function POSTerminal() {
 
   const clearCart = useCallback(() => {
     setSale(prev => ({ ...prev, cart: [] }));
-    setScreen('ready');
   }, []);
 
   const resetSale = useCallback(() => {
     setSale(createEmptySale());
-    setActiveCategory('all');
-    setScreen('ready');
+    setScreen('scanning');
   }, []);
 
   const total = getCartTotal(sale.cart, sale.orderDiscount);
 
-  // Render logic
-  if (screen === 'ready') {
+  if (screen === 'scanning') {
     return (
       <div className="h-screen bg-background">
-        <ReadyScreen cashierName={CASHIER_NAME} onNewSale={() => setScreen('selling')} />
-      </div>
-    );
-  }
-
-  if (screen === 'selling') {
-    return (
-      <div className="h-screen bg-background flex">
-        <div className="flex-1 border-r border-border/50">
-          <ProductScreen
-            onAddProduct={addProduct}
-            activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
-          />
-        </div>
-        <div className="w-[380px] bg-card">
-          <CartSidebar
-            cart={sale.cart}
-            orderDiscount={sale.orderDiscount}
-            onUpdateQty={updateQty}
-            onRemove={removeItem}
-            onClear={clearCart}
-            onCheckout={() => setScreen('cartReview')}
-            onHoldSale={() => setScreen('ready')}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (screen === 'cartReview') {
-    return (
-      <div className="h-screen bg-background">
-        <CartReviewScreen
+        <ScanScreen
           cart={sale.cart}
           orderDiscount={sale.orderDiscount}
+          onAddProduct={addProduct}
           onUpdateQty={updateQty}
           onRemove={removeItem}
-          onBack={() => setScreen('selling')}
-          onNext={() => setScreen('customerAttach')}
-        />
-      </div>
-    );
-  }
-
-  if (screen === 'customerAttach') {
-    return (
-      <div className="h-screen bg-background">
-        <CustomerAttachScreen
-          onAttach={(customer) => {
-            updateSale({ customer });
-            setScreen('saleActions');
-          }}
-          onSkip={() => setScreen('saleActions')}
-          onBack={() => setScreen('cartReview')}
-        />
-      </div>
-    );
-  }
-
-  if (screen === 'saleActions') {
-    return (
-      <div className="h-screen bg-background">
-        <SaleActionsScreen
-          orderNote={sale.orderNote}
-          discountCode={sale.discountCode}
-          isGift={sale.isGift}
-          giftReceipt={sale.giftReceipt}
-          onUpdate={(data) => updateSale(data)}
-          onBack={() => setScreen('customerAttach')}
-          onNext={() => setScreen('tender')}
+          onClear={clearCart}
+          onCheckout={() => setScreen('tender')}
         />
       </div>
     );
@@ -176,7 +93,7 @@ export default function POSTerminal() {
             else if (method === 'card') setScreen('cardPayment');
             else setScreen('splitTender');
           }}
-          onBack={() => setScreen('saleActions')}
+          onBack={() => setScreen('scanning')}
         />
       </div>
     );
@@ -189,7 +106,7 @@ export default function POSTerminal() {
           total={total}
           onComplete={(cashReceived) => {
             updateSale({ cashReceived });
-            setScreen('paymentSuccess');
+            setScreen('receipt');
           }}
           onBack={() => setScreen('tender')}
         />
@@ -202,7 +119,7 @@ export default function POSTerminal() {
       <div className="h-screen bg-background">
         <CardPaymentScreen
           total={total}
-          onComplete={() => setScreen('paymentSuccess')}
+          onComplete={() => setScreen('receipt')}
           onBack={() => setScreen('tender')}
         />
       </div>
@@ -216,7 +133,7 @@ export default function POSTerminal() {
           total={total}
           onComplete={(cashAmount) => {
             updateSale({ splitCashAmount: cashAmount });
-            setScreen('paymentSuccess');
+            setScreen('receipt');
           }}
           onBack={() => setScreen('tender')}
         />
@@ -224,10 +141,10 @@ export default function POSTerminal() {
     );
   }
 
-  if (screen === 'paymentSuccess') {
+  if (screen === 'receipt') {
     return (
       <div className="h-screen bg-background">
-        <PaymentSuccessScreen
+        <ReceiptScreen
           total={total}
           tenderMethod={sale.tenderMethod!}
           cashReceived={sale.cashReceived}
