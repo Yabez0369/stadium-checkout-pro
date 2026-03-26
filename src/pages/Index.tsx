@@ -1,24 +1,19 @@
-import { useSearchParams } from 'react-router-dom';
-import POSTerminal from '@/components/pos/POSTerminal';
-import CustomerDisplay from '@/components/pos/CustomerDisplay';
-import { createEmptySale, getCartTotal } from '@/data/posProducts';
+import { Navigate, useSearchParams } from 'react-router-dom';
+import HomePage from '@/pages/HomePage';
+import { CUSTOMER_DISPLAY_PATH } from '@/lib/customerDisplaySync';
+import { isPosAuthenticated } from '@/lib/posAuth';
 
 export default function Index() {
   const [searchParams] = useSearchParams();
   const isCustomerView = searchParams.get('view') === 'customer';
 
   if (isCustomerView) {
-    // Demo customer display with empty state
-    const sale = createEmptySale();
-    return (
-      <CustomerDisplay
-        cart={sale.cart}
-        orderDiscount={sale.orderDiscount}
-        paymentState="scanning"
-        total={getCartTotal(sale.cart, sale.orderDiscount)}
-      />
-    );
+    return <Navigate to={CUSTOMER_DISPLAY_PATH} replace />;
   }
 
-  return <POSTerminal />;
+  if (!isPosAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <HomePage />;
 }

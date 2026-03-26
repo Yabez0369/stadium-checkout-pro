@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, CreditCard, Wifi, Check, X, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import CustomerDisplayLaunchButton from '@/components/pos/CustomerDisplayLaunchButton';
 
 interface CardPaymentScreenProps {
   total: number;
@@ -29,19 +30,22 @@ export default function CardPaymentScreen({ total, onComplete, onBack }: CardPay
   }, [state, onComplete]);
 
   return (
-    <div className="flex flex-col h-full items-center justify-center pos-fade-in">
-      <div className="absolute top-5 left-6">
-        <Button variant="pos-ghost" size="pos-icon" onClick={onBack}>
-          <ArrowLeft className="w-5 h-5" />
+    <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-4 pos-fade-in md:overflow-hidden">
+      <div className="absolute left-6 top-5 md:left-10 md:top-8">
+        <Button variant="pos-ghost" size="pos-icon" onClick={onBack} className="h-12 w-12 md:h-14 md:w-14 rounded-2xl">
+          <ArrowLeft className="h-5 w-5 md:h-6 md:w-6" />
         </Button>
       </div>
-
-      <div className="text-center mb-8">
-        <p className="text-muted-foreground mb-1">Charging</p>
-        <p className="text-4xl font-extrabold text-foreground">${total.toFixed(2)}</p>
+      <div className="absolute right-6 top-5 md:right-10 md:top-8">
+        <CustomerDisplayLaunchButton variant="compact" />
       </div>
 
-      <div className="pos-card-elevated p-10 w-96 text-center">
+      <div className="mb-5 shrink-0 text-center md:mb-6">
+        <p className="mb-1 text-muted-foreground md:text-lg">Charging</p>
+        <p className="text-4xl font-extrabold text-foreground md:text-5xl lg:text-6xl">${total.toFixed(2)}</p>
+      </div>
+
+      <div className="w-full max-w-md shrink pos-card-elevated p-6 text-center md:max-w-lg md:p-10">
         {state === 'waiting' && (
           <>
             <div className="w-20 h-20 rounded-2xl bg-primary/10 mx-auto mb-6 flex items-center justify-center animate-pulse">
@@ -101,7 +105,7 @@ export default function CardPaymentScreen({ total, onComplete, onBack }: CardPay
       </div>
 
       {/* Terminal status */}
-      <div className="mt-6 flex items-center gap-2 text-sm text-pos-text-muted">
+      <div className="mt-4 flex shrink-0 items-center gap-2 text-sm text-pos-text-muted md:mt-5">
         <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
         <span>Terminal connected</span>
       </div>

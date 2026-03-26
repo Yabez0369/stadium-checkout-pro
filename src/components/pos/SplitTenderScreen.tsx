@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Banknote, CreditCard, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import CustomerDisplayLaunchButton from '@/components/pos/CustomerDisplayLaunchButton';
 
 interface SplitTenderScreenProps {
   total: number;
@@ -26,17 +27,20 @@ export default function SplitTenderScreen({ total, onComplete, onBack }: SplitTe
   };
 
   return (
-    <div className="flex h-full pos-fade-in">
+    <div className="relative flex min-h-0 flex-1 overflow-hidden pos-fade-in">
       {/* Left - Split summary */}
-      <div className="flex-1 flex flex-col items-center justify-center px-8">
-        <div className="absolute top-5 left-6">
-          <Button variant="pos-ghost" size="pos-icon" onClick={onBack}>
-            <ArrowLeft className="w-5 h-5" />
+      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-6 md:overflow-hidden md:px-10">
+        <div className="absolute left-6 top-5 md:left-10 md:top-8">
+          <Button variant="pos-ghost" size="pos-icon" onClick={onBack} className="h-12 w-12 md:h-14 md:w-14 rounded-2xl">
+            <ArrowLeft className="h-5 w-5 md:h-6 md:w-6" />
           </Button>
         </div>
+        <div className="absolute right-6 top-5 md:right-10 md:top-8">
+          <CustomerDisplayLaunchButton variant="compact" />
+        </div>
 
-        <h2 className="text-xl font-bold text-foreground mb-2">Split Payment</h2>
-        <p className="text-muted-foreground mb-8">Pay with Cash + Card</p>
+        <h2 className="mb-1 text-xl font-bold text-foreground">Split Payment</h2>
+        <p className="mb-5 text-muted-foreground md:mb-6">Pay with Cash + Card</p>
 
         {/* Visual breakdown */}
         <div className="w-full max-w-sm space-y-4">
@@ -70,7 +74,7 @@ export default function SplitTenderScreen({ total, onComplete, onBack }: SplitTe
       </div>
 
       {/* Right - Input */}
-      <div className="w-80 bg-card border-l border-border/50 p-5 flex flex-col">
+      <div className="flex h-full min-h-0 w-[min(100%,22rem)] shrink-0 flex-col overflow-y-auto border-l border-border/50 bg-card p-5 md:w-96 md:overflow-hidden md:p-7">
         {step === 'enter-cash' && (
           <>
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Cash Amount</h3>

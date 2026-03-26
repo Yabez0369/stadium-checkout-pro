@@ -3,6 +3,7 @@ import {
   POSScreen, SaleState, CartItem, Product,
   createEmptySale, generateTransactionId, getCartTotal,
 } from '@/data/posProducts';
+import { useCustomerDisplayBroadcast } from '@/lib/customerDisplaySync';
 
 import ScanScreen from './ScanScreen';
 import TenderScreen from './TenderScreen';
@@ -38,6 +39,25 @@ export default function POSTerminal() {
     });
   }, []);
 
+  const removeProductFromCart = useCallback((product: Product, variantId?: string) => {
+    setSale(prev => {
+      const variant = variantId ? product.variants?.find(v => v.id === variantId) : undefined;
+      const existingIdx = prev.cart.findIndex(
+        i => i.product.id === product.id && i.selectedVariant?.id === variant?.id
+      );
+      if (existingIdx < 0) return prev;
+      const updated = [...prev.cart];
+      const item = updated[existingIdx];
+      const newQty = item.quantity - 1;
+      if (newQty <= 0) {
+        updated.splice(existingIdx, 1);
+      } else {
+        updated[existingIdx] = { ...item, quantity: newQty };
+      }
+      return { ...prev, cart: updated };
+    });
+  }, []);
+
   const updateQty = useCallback((itemId: string, delta: number) => {
     setSale(prev => {
       const updated = prev.cart.map(i => {
@@ -66,13 +86,16 @@ export default function POSTerminal() {
 
   const total = getCartTotal(sale.cart, sale.orderDiscount);
 
+  useCustomerDisplayBroadcast(sale, screen);
+
   if (screen === 'scanning') {
     return (
-      <div className="h-screen bg-background">
+      <div className="pos-app-shell">
         <ScanScreen
           cart={sale.cart}
           orderDiscount={sale.orderDiscount}
           onAddProduct={addProduct}
+          onRemoveProductFromCart={removeProductFromCart}
           onUpdateQty={updateQty}
           onRemove={removeItem}
           onClear={clearCart}
@@ -84,7 +107,7 @@ export default function POSTerminal() {
 
   if (screen === 'tender') {
     return (
-      <div className="h-screen bg-background">
+      <div className="pos-app-shell">
         <TenderScreen
           total={total}
           onSelect={(method) => {
@@ -101,7 +124,7 @@ export default function POSTerminal() {
 
   if (screen === 'cashPayment') {
     return (
-      <div className="h-screen bg-background">
+      <div className="pos-app-shell">
         <CashPaymentScreen
           total={total}
           onComplete={(cashReceived) => {
@@ -116,7 +139,7 @@ export default function POSTerminal() {
 
   if (screen === 'cardPayment') {
     return (
-      <div className="h-screen bg-background">
+      <div className="pos-app-shell">
         <CardPaymentScreen
           total={total}
           onComplete={() => setScreen('receipt')}
@@ -128,7 +151,7 @@ export default function POSTerminal() {
 
   if (screen === 'splitTender') {
     return (
-      <div className="h-screen bg-background">
+      <div className="pos-app-shell">
         <SplitTenderScreen
           total={total}
           onComplete={(cashAmount) => {
@@ -143,7 +166,7 @@ export default function POSTerminal() {
 
   if (screen === 'receipt') {
     return (
-      <div className="h-screen bg-background">
+      <div className="pos-app-shell">
         <ReceiptScreen
           total={total}
           tenderMethod={sale.tenderMethod!}
