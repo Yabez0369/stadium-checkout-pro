@@ -18,14 +18,14 @@ const comingSoon = (label: string) => {
 };
 
 const cardBase =
-  'flex min-h-0 flex-col rounded-2xl text-left pos-transition md:h-full md:min-h-0 md:overflow-hidden md:p-4 lg:rounded-3xl lg:p-5';
+  'flex min-h-0 flex-col rounded-2xl border border-border/50 text-left shadow-sm pos-transition md:h-full md:min-h-0 md:overflow-hidden md:p-5 lg:rounded-3xl lg:p-6';
 
 export default function HomePage() {
   const navigate = useNavigate();
 
   return (
     <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-background pos-fade-in">
-      <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border/40 bg-card/40 px-5 backdrop-blur-sm sm:px-8 md:h-[3.75rem] md:px-10">
+      <header className="flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border/40 bg-card/50 px-5 backdrop-blur-md sm:px-8 md:px-10 xl:px-12 ipad-pro:px-14">
         <div className="flex min-w-0 items-center gap-3 md:gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/20 md:h-10 md:w-10">
             <Ticket className="h-4 w-4 text-primary md:h-5 md:w-5" strokeWidth={2.25} />
@@ -55,26 +55,26 @@ export default function HomePage() {
       </header>
 
       {/* Phone: scroll. Tablet+: one screen, no scroll */}
-      <main className="mx-auto flex w-full min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5 pb-10 sm:px-6 md:max-w-6xl md:overflow-hidden md:px-8 md:py-4 md:pb-5 lg:max-w-7xl lg:px-10">
-        <div className="mb-5 shrink-0 text-center sm:mb-4 sm:text-left md:mb-3">
-          <h1 className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl md:text-[clamp(1.35rem,2.8vw,2rem)] lg:text-4xl">
+      <main className="mx-auto flex w-full min-h-0 flex-1 flex-col overflow-y-auto px-4 py-5 pb-10 sm:px-6 md:max-w-6xl md:overflow-hidden md:px-8 md:py-5 md:pb-6 lg:max-w-7xl lg:px-10 xl:max-w-[90rem] xl:px-12 ipad-pro:max-w-[100rem] ipad-pro:px-14">
+        <div className="mb-6 shrink-0 text-center sm:mb-5 sm:text-left md:mb-6">
+          <h1 className="text-balance text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl md:text-[clamp(1.4rem,2.5vw,2.125rem)] lg:text-4xl">
             What would you like to do?
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground md:mt-1.5 md:text-[clamp(0.8rem,1.6vw,1rem)]">
+          <p className="mt-2 max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground md:mt-2 md:text-base">
             Choose a workflow. Billing opens the register and scan screen.
           </p>
         </div>
 
         <div
           className={`
-            grid min-h-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-2
-            md:grid-rows-2 md:gap-3 md:[grid-template-rows:repeat(2,minmax(0,1fr))]
-            lg:gap-4
+            grid min-h-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5
+            md:grid-rows-2 md:gap-4 md:[grid-template-rows:repeat(2,minmax(0,1fr))]
+            lg:gap-5
           `}
         >
           <Link
             to="/pos"
-            className={`group relative border-2 border-primary/35 bg-gradient-to-br from-primary/[0.07] to-primary/[0.02] p-5 shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.35)] hover:border-primary/55 hover:shadow-[0_12px_40px_-12px_hsl(var(--primary)/0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${cardBase}`}
+            className={`group relative border-2 border-primary/40 bg-gradient-to-br from-primary/[0.08] to-primary/[0.02] shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.3)] hover:border-primary/60 hover:shadow-[0_12px_44px_-12px_hsl(var(--primary)/0.38)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${cardBase}`}
           >
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md shadow-primary/20 group-hover:scale-[1.02] md:h-12 md:w-12 lg:h-14 lg:w-14">
               <CreditCard className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2} />
@@ -85,7 +85,7 @@ export default function HomePage() {
             <p className="mt-1.5 flex-1 text-sm leading-snug text-muted-foreground md:text-[0.8125rem] md:leading-snug lg:text-sm">
               New sale — scan items, take payment, and print receipt.
             </p>
-            <p className="mt-3 text-sm font-semibold text-primary group-hover:underline md:mt-2">
+            <p className="mt-auto pt-4 text-sm font-semibold text-primary group-hover:underline">
               Open register →
             </p>
           </Link>
@@ -93,7 +93,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => comingSoon('Return & refund')}
-            className={`group border border-border/80 bg-card p-5 shadow-sm hover:bg-accent/30 hover:shadow-md ${cardBase}`}
+            className={`group hover:bg-accent/25 hover:shadow-md ${cardBase}`}
           >
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-foreground md:h-12 md:w-12 lg:h-14 lg:w-14">
               <RotateCcw className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2} />
@@ -104,12 +104,13 @@ export default function HomePage() {
             <p className="mt-1.5 flex-1 text-sm leading-snug text-muted-foreground md:text-[0.8125rem] lg:text-sm">
               Process returns, partial refunds, and store credit.
             </p>
+            <span className="mt-auto pt-4 text-xs font-medium text-muted-foreground/80">Coming soon</span>
           </button>
 
           <button
             type="button"
             onClick={() => comingSoon('Exchange')}
-            className={`group border border-border/80 bg-card p-5 shadow-sm hover:bg-accent/30 hover:shadow-md ${cardBase}`}
+            className={`group hover:bg-accent/25 hover:shadow-md ${cardBase}`}
           >
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-foreground md:h-12 md:w-12 lg:h-14 lg:w-14">
               <ArrowLeftRight className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2} />
@@ -120,12 +121,13 @@ export default function HomePage() {
             <p className="mt-1.5 flex-1 text-sm leading-snug text-muted-foreground md:text-[0.8125rem] lg:text-sm">
               Swap items, adjust price differences, and update inventory.
             </p>
+            <span className="mt-auto pt-4 text-xs font-medium text-muted-foreground/80">Coming soon</span>
           </button>
 
           <button
             type="button"
             onClick={() => comingSoon('Online orders')}
-            className={`group border border-border/80 bg-card p-5 shadow-sm hover:bg-accent/30 hover:shadow-md ${cardBase}`}
+            className={`group hover:bg-accent/25 hover:shadow-md ${cardBase}`}
           >
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-secondary text-foreground md:h-12 md:w-12 lg:h-14 lg:w-14">
               <ShoppingBag className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2} />
@@ -136,6 +138,7 @@ export default function HomePage() {
             <p className="mt-1.5 flex-1 text-sm leading-snug text-muted-foreground md:text-[0.8125rem] lg:text-sm">
               Pick up, ship-from-store, and web order fulfillment.
             </p>
+            <span className="mt-auto pt-4 text-xs font-medium text-muted-foreground/80">Coming soon</span>
           </button>
         </div>
       </main>

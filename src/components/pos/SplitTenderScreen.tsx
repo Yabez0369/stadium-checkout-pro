@@ -27,20 +27,24 @@ export default function SplitTenderScreen({ total, onComplete, onBack }: SplitTe
   };
 
   return (
-    <div className="relative flex min-h-0 flex-1 overflow-hidden pos-fade-in">
-      {/* Left - Split summary */}
-      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-6 md:overflow-hidden md:px-10">
-        <div className="absolute left-6 top-5 md:left-10 md:top-8">
-          <Button variant="pos-ghost" size="pos-icon" onClick={onBack} className="h-12 w-12 md:h-14 md:w-14 rounded-2xl">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden pos-fade-in">
+      <header className="pos-register-header grid shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 md:px-8 xl:px-10 ipad-pro:px-12">
+        <div className="flex justify-start">
+          <Button variant="pos-ghost" size="pos-icon" onClick={onBack} className="h-11 w-11 rounded-2xl md:h-12 md:w-12">
             <ArrowLeft className="h-5 w-5 md:h-6 md:w-6" />
           </Button>
         </div>
-        <div className="absolute right-6 top-5 md:right-10 md:top-8">
+        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground md:text-xs">Split</p>
+        <div className="flex justify-end">
           <CustomerDisplayLaunchButton variant="compact" />
         </div>
+      </header>
 
-        <h2 className="mb-1 text-xl font-bold text-foreground">Split Payment</h2>
-        <p className="mb-5 text-muted-foreground md:mb-6">Pay with Cash + Card</p>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
+      {/* Left - Split summary */}
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-6 py-6 md:overflow-hidden md:px-10 md:py-8">
+        <h2 className="mb-1 text-center text-xl font-bold text-foreground">Split payment</h2>
+        <p className="mb-6 text-center text-muted-foreground md:mb-8">Cash + card on one sale</p>
 
         {/* Visual breakdown */}
         <div className="w-full max-w-sm space-y-4">
@@ -74,7 +78,7 @@ export default function SplitTenderScreen({ total, onComplete, onBack }: SplitTe
       </div>
 
       {/* Right - Input */}
-      <div className="flex h-full min-h-0 w-[min(100%,22rem)] shrink-0 flex-col overflow-y-auto border-l border-border/50 bg-card p-5 md:w-96 md:overflow-hidden md:p-7">
+      <div className="flex min-h-0 w-full shrink-0 flex-col overflow-y-auto border-t border-border/40 bg-card/60 p-5 md:h-full md:w-96 md:overflow-hidden md:border-l md:border-t-0 md:p-7">
         {step === 'enter-cash' && (
           <>
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Cash Amount</h3>
@@ -125,6 +129,7 @@ export default function SplitTenderScreen({ total, onComplete, onBack }: SplitTe
             <p className="text-lg font-semibold text-success">All Paid!</p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

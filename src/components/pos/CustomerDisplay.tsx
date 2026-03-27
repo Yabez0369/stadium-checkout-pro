@@ -1,5 +1,5 @@
 import { CartItem, getCartSubtotal, getCartTax } from '@/data/posProducts';
-import { Check, CreditCard, Loader2, Sparkles, Ticket } from 'lucide-react';
+import { Check, CreditCard, Loader2, Sparkles, Ticket, UserRound } from 'lucide-react';
 
 interface CustomerDisplayProps {
   cart: CartItem[];
@@ -9,6 +9,8 @@ interface CustomerDisplayProps {
   tenderMethod?: 'cash' | 'card' | 'split' | null;
   /** Shown on receipt step */
   transactionId?: string;
+  /** Shown when the sale is linked to a customer */
+  customerName?: string | null;
   /** True when no register has connected yet (BroadcastChannel idle) */
   awaitingRegister?: boolean;
 }
@@ -27,6 +29,7 @@ export default function CustomerDisplay({
   total,
   tenderMethod,
   transactionId,
+  customerName,
   awaitingRegister,
 }: CustomerDisplayProps) {
   const subtotal = getCartSubtotal(cart);
@@ -51,7 +54,7 @@ export default function CustomerDisplay({
       />
 
       {/* Header */}
-      <header className="relative z-10 flex h-[3.75rem] shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/70 px-5 shadow-sm backdrop-blur-md sm:h-16 sm:px-8 md:h-[4.25rem] md:px-10">
+      <header className="relative z-10 flex h-[3.75rem] shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/70 px-5 shadow-sm backdrop-blur-md sm:h-16 sm:px-8 md:h-[4.25rem] md:px-10 xl:px-12 ipad-pro:px-14">
         <div className="flex min-w-0 items-center gap-3 md:gap-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 ring-1 ring-primary/20 md:h-12 md:w-12">
             <Ticket className="h-5 w-5 text-primary md:h-6 md:w-6" strokeWidth={2.25} />
@@ -76,13 +79,22 @@ export default function CustomerDisplay({
       <div className="relative z-10 flex min-h-0 flex-1 gap-0 overflow-hidden md:gap-px">
         {/* Line items */}
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="shrink-0 border-b border-slate-200/80 bg-white/40 px-5 py-3 sm:px-8 md:px-10 md:py-4">
+          <div className="shrink-0 border-b border-slate-200/80 bg-white/40 px-5 py-3 sm:px-8 md:px-10 md:py-4 xl:px-12 ipad-pro:px-14">
             <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500 md:text-xs">
               {hasItems ? 'Items in your order' : 'Order'}
             </h2>
+            {customerName ? (
+              <div className="mt-2 flex items-center gap-2 text-sm text-slate-600 md:text-base">
+                <UserRound className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+                <span className="min-w-0 truncate">
+                  <span className="font-medium text-slate-500">Customer · </span>
+                  <span className="font-semibold text-slate-800">{customerName}</span>
+                </span>
+              </div>
+            ) : null}
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-8 md:px-10 md:py-6">
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-8 md:px-10 md:py-6 xl:px-12 xl:py-8 ipad-pro:px-14">
             {awaitingRegister && !hasItems ? (
               <div className="flex h-full min-h-[12rem] flex-col items-center justify-center text-center">
                 <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl border border-slate-200 bg-white shadow-[0_12px_40px_-16px_rgba(15,23,42,0.12)]">
@@ -139,8 +151,8 @@ export default function CustomerDisplay({
         </div>
 
         {/* Totals rail */}
-        <aside className="flex w-full min-w-0 shrink-0 flex-col border-t border-slate-200/90 bg-white/90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] backdrop-blur-xl sm:w-[min(100%,22rem)] md:w-[min(100%,26rem)] md:border-l md:border-t-0 lg:w-[min(100%,28rem)]">
-          <div className="flex min-h-0 flex-1 flex-col justify-end p-5 sm:p-6 md:p-8">
+        <aside className="flex w-full min-w-0 shrink-0 flex-col border-t border-slate-200/90 bg-white/90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] backdrop-blur-xl sm:w-[min(100%,22rem)] md:w-[min(100%,26rem)] md:border-l md:border-t-0 lg:w-[min(100%,28rem)] xl:w-[min(100%,30rem)] ipad-pro:w-[min(100%,32rem)]">
+          <div className="flex min-h-0 flex-1 flex-col justify-end p-5 sm:p-6 md:p-8 xl:p-10 ipad-pro:p-12">
             {hasItems && (
               <div className="space-y-3 border-b border-slate-200/80 pb-6">
                 <div className="flex justify-between text-sm text-slate-500">

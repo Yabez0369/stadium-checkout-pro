@@ -13,6 +13,12 @@ export default {
       },
     },
     extend: {
+      screens: {
+        /** iPad 10.9" / 11" portrait & similar — between md and lg */
+        ipad: "834px",
+        /** Large tablet / iPad Pro 12.9" landscape width */
+        "ipad-pro": "1366px",
+      },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },

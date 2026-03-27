@@ -37,6 +37,7 @@ export type POSScreen =
 export interface SaleState {
   cart: CartItem[];
   orderDiscount: number;
+  customerId: string | null;
   tenderMethod: 'cash' | 'card' | 'split' | null;
   cashReceived: number;
   splitCashAmount: number;
@@ -118,6 +119,7 @@ export function createEmptySale(): SaleState {
   return {
     cart: [],
     orderDiscount: 0,
+    customerId: null,
     tenderMethod: null,
     cashReceived: 0,
     splitCashAmount: 0,

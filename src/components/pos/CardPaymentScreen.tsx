@@ -30,22 +30,26 @@ export default function CardPaymentScreen({ total, onComplete, onBack }: CardPay
   }, [state, onComplete]);
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-4 pos-fade-in md:overflow-hidden">
-      <div className="absolute left-6 top-5 md:left-10 md:top-8">
-        <Button variant="pos-ghost" size="pos-icon" onClick={onBack} className="h-12 w-12 md:h-14 md:w-14 rounded-2xl">
-          <ArrowLeft className="h-5 w-5 md:h-6 md:w-6" />
-        </Button>
-      </div>
-      <div className="absolute right-6 top-5 md:right-10 md:top-8">
-        <CustomerDisplayLaunchButton variant="compact" />
-      </div>
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden pos-fade-in">
+      <header className="pos-register-header grid shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 md:px-8 xl:px-10 ipad-pro:px-12">
+        <div className="flex justify-start">
+          <Button variant="pos-ghost" size="pos-icon" onClick={onBack} className="h-11 w-11 rounded-2xl md:h-12 md:w-12">
+            <ArrowLeft className="h-5 w-5 md:h-6 md:w-6" />
+          </Button>
+        </div>
+        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground md:text-xs">Card</p>
+        <div className="flex justify-end">
+          <CustomerDisplayLaunchButton variant="compact" />
+        </div>
+      </header>
 
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-6 md:overflow-hidden md:px-8 md:py-8">
       <div className="mb-5 shrink-0 text-center md:mb-6">
         <p className="mb-1 text-muted-foreground md:text-lg">Charging</p>
         <p className="text-4xl font-extrabold text-foreground md:text-5xl lg:text-6xl">${total.toFixed(2)}</p>
       </div>
 
-      <div className="w-full max-w-md shrink pos-card-elevated p-6 text-center md:max-w-lg md:p-10">
+      <div className="w-full max-w-md shrink-0 rounded-2xl border border-border/50 bg-card p-6 text-center shadow-sm md:max-w-lg md:p-10">
         {state === 'waiting' && (
           <>
             <div className="w-20 h-20 rounded-2xl bg-primary/10 mx-auto mb-6 flex items-center justify-center animate-pulse">
@@ -105,9 +109,10 @@ export default function CardPaymentScreen({ total, onComplete, onBack }: CardPay
       </div>
 
       {/* Terminal status */}
-      <div className="mt-4 flex shrink-0 items-center gap-2 text-sm text-pos-text-muted md:mt-5">
-        <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+      <div className="mt-6 flex shrink-0 items-center gap-2 text-sm text-pos-text-muted">
+        <div className="h-2 w-2 animate-pulse rounded-full bg-success" />
         <span>Terminal connected</span>
+      </div>
       </div>
     </div>
   );

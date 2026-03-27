@@ -4,7 +4,10 @@ import { Scan, Minus, Plus, ArrowRight, X, Camera, MinusCircle, LogOut, House } 
 import { Button } from '@/components/ui/button';
 import { CameraBarcodeScanDialog } from '@/components/pos/CameraBarcodeScanDialog';
 import CustomerDisplayLaunchButton from '@/components/pos/CustomerDisplayLaunchButton';
+import CustomerToolbar from '@/components/pos/CustomerToolbar';
 import { CartItem, Product, searchProducts, findProductByBarcode, getCartSubtotal, getCartTax, getCartTotal } from '@/data/posProducts';
+import { getCustomerById } from '@/data/customers';
+import type { ParkSaleResult } from '@/data/parkedSales';
 import { formatCameraAccessError, needsHttpsForCamera, preflightCameraPermission } from '@/lib/cameraSecureContext';
 import { toast } from '@/components/ui/sonner';
 import { setPosAuthenticated } from '@/lib/posAuth';
@@ -19,23 +22,35 @@ function cartLineIndexForProduct(cart: CartItem[], product: Product, variantId?:
 interface ScanScreenProps {
   cart: CartItem[];
   orderDiscount: number;
+  customerId: string | null;
+  parkedCount: number;
   onAddProduct: (product: Product, variantId?: string) => void;
   onRemoveProductFromCart: (product: Product, variantId?: string) => void;
   onUpdateQty: (itemId: string, delta: number) => void;
   onRemove: (itemId: string) => void;
   onClear: () => void;
   onCheckout: () => void;
+  onAttachCustomer: (customerId: string | null) => void;
+  onClearCustomer: () => void;
+  onParkSale: () => ParkSaleResult;
+  onRecallParkedSale: (parkedId: string) => void;
 }
 
 export default function ScanScreen({
   cart,
   orderDiscount,
+  customerId,
+  parkedCount,
   onAddProduct,
   onRemoveProductFromCart,
   onUpdateQty,
   onRemove,
   onClear,
   onCheckout,
+  onAttachCustomer,
+  onClearCustomer,
+  onParkSale,
+  onRecallParkedSale,
 }: ScanScreenProps) {
   const navigate = useNavigate();
   const [scanInput, setScanInput] = useState('');
@@ -52,6 +67,8 @@ export default function ScanScreen({
   const tax = getCartTax(cart, orderDiscount);
   const total = getCartTotal(cart, orderDiscount);
   const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
+  const customerDisplayName =
+    customerId != null ? getCustomerById(customerId)?.displayName ?? 'Customer' : null;
 
   // Auto-focus scan input
   useEffect(() => {
@@ -165,37 +182,36 @@ export default function ScanScreen({
   const dateStr = currentTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 
   return (
-    <div className="flex min-h-0 flex-1 overflow-hidden pos-fade-in">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row pos-fade-in">
       {/* LEFT — Scan Console */}
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        {/* Top bar — Home sits low on the left; brand + actions align to top row */}
-        <div className="flex h-[4.5rem] shrink-0 items-start justify-between gap-4 border-b border-border/30 px-4 pt-2.5 md:h-[5rem] md:px-8 md:pt-3">
-          <div className="flex min-w-0 flex-1 items-stretch gap-0 md:gap-1">
-            <div className="flex flex-col justify-end pb-1 pr-3 md:pr-4">
-              <button
-                type="button"
-                onClick={() => navigate('/')}
-                className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-border/60 bg-background px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground pos-transition md:px-4 md:text-sm"
-                title="Back to home"
-              >
-                <House className="h-4 w-4 shrink-0 md:h-5 md:w-5" />
-                Home
-              </button>
-            </div>
-            <div className="flex min-w-0 items-center gap-2.5 border-l border-border/50 pl-3 md:gap-3 md:pl-5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 md:h-10 md:w-10">
-                <span className="text-sm font-bold text-primary md:text-base">⚽</span>
+        {/* Top bar — single baseline: all controls vertically centered */}
+        <header className="pos-register-header px-4 md:px-8 ipad:px-10 xl:px-10 ipad-pro:px-12">
+          <div className="flex min-w-0 flex-1 items-center gap-3 md:gap-4">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-border/60 bg-background px-3 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground pos-transition md:h-11 md:px-4 md:text-sm"
+              title="Back to home"
+            >
+              <House className="h-4 w-4 shrink-0 md:h-[1.125rem] md:w-[1.125rem]" />
+              Home
+            </button>
+            <div className="hidden h-8 w-px shrink-0 bg-border/60 sm:block" aria-hidden />
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12 ring-1 ring-primary/15 md:h-11 md:w-11">
+                <span className="text-base font-bold leading-none text-primary md:text-lg">⚽</span>
               </div>
-              <div className="min-w-0 leading-tight">
+              <div className="min-w-0">
                 <p className="truncate text-sm font-semibold tracking-tight text-foreground md:text-base">
                   <span className="text-foreground">SCS</span>
                   <span className="text-primary">-TIX</span>
                 </p>
-                <p className="truncate text-[11px] text-muted-foreground md:text-xs">Terminal 1</p>
+                <p className="truncate text-[11px] leading-none text-muted-foreground md:text-xs">Terminal 1</p>
               </div>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2.5 sm:gap-3 md:gap-4">
+          <div className="flex shrink-0 items-center gap-2 md:gap-3">
             <CustomerDisplayLaunchButton variant="compact" />
             <button
               type="button"
@@ -203,25 +219,25 @@ export default function ScanScreen({
                 setPosAuthenticated(false);
                 navigate('/login', { replace: true });
               }}
-              className="inline-flex items-center gap-2 rounded-xl border border-border/60 bg-background px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground pos-transition md:px-4 md:text-sm"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-border/60 bg-background px-3 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground pos-transition md:h-11 md:px-4 md:text-sm"
               title="Sign out"
             >
-              <LogOut className="h-4 w-4 shrink-0 md:h-5 md:w-5" />
+              <LogOut className="h-4 w-4 shrink-0 md:h-[1.125rem] md:w-[1.125rem]" />
               <span className="hidden sm:inline">Sign out</span>
             </button>
-            <div className="text-right text-[11px] text-muted-foreground md:text-sm">
-              <p className="font-medium leading-snug text-foreground">Alex T.</p>
-              <p className="mt-0.5 tabular-nums leading-snug">
+            <div className="hidden min-w-0 border-l border-border/50 pl-3 text-right sm:block md:pl-4">
+              <p className="text-xs font-medium leading-tight text-foreground md:text-sm">Alex T.</p>
+              <p className="mt-0.5 text-[11px] tabular-nums leading-tight text-muted-foreground md:text-xs">
                 <span>{dateStr}</span>
-                <span className="mx-1 text-border/80">·</span>
+                <span className="mx-1 text-border/70">·</span>
                 <span className="font-medium text-foreground">{timeStr}</span>
               </p>
             </div>
           </div>
-        </div>
+        </header>
 
         {/* Main scan area */}
-        <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-5 md:overflow-hidden md:px-8 md:py-5 lg:px-10">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-5 md:overflow-hidden md:px-8 md:py-5 ipad:px-10 lg:px-10 xl:px-12 ipad-pro:px-14">
           {/* Scan dock */}
           <div className="w-full max-w-2xl md:max-w-3xl">
             {/* Status indicator */}
@@ -405,38 +421,63 @@ export default function ScanScreen({
         </div>
       </div>
 
-      {/* RIGHT — Cart Panel */}
-      <div className="flex min-h-0 w-[min(100%,32rem)] min-w-[20rem] shrink-0 flex-col overflow-hidden border-l border-border/30 bg-card/50 sm:min-w-[24rem] md:min-w-[28rem] lg:min-w-[30rem]">
+      {/* RIGHT — Cart rail: sale tools + cart (split from scan header for calmer layout) */}
+      <aside className="pos-cart-rail flex min-h-0 w-full min-w-0 shrink-0 flex-col overflow-hidden md:w-[min(100%,36rem)] md:min-w-[28rem] lg:min-w-[30rem] xl:min-w-[31rem] ipad-pro:min-w-[33rem]">
+        <CustomerToolbar
+          customerId={customerId}
+          cartItemCount={itemCount}
+          parkedCount={parkedCount}
+          onAttachCustomer={onAttachCustomer}
+          onClearCustomer={onClearCustomer}
+          onParkSale={onParkSale}
+          onRecallParkedSale={onRecallParkedSale}
+        />
         {cart.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center px-8">
-            <div className="w-16 h-16 rounded-2xl bg-secondary/60 flex items-center justify-center mb-4">
-              <Scan className="w-8 h-8 text-muted-foreground/50" />
+          <div className="flex flex-1 flex-col items-center justify-center px-6 py-10">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-border/60 bg-background shadow-sm">
+              <Scan className="h-8 w-8 text-muted-foreground/45" />
             </div>
-            <p className="text-base font-semibold text-muted-foreground/70">No items yet</p>
-            <p className="text-sm text-muted-foreground/50 mt-1.5">Scan a product to begin</p>
+            <p className="text-base font-semibold text-muted-foreground">No items yet</p>
+            <p className="mt-1 text-center text-sm text-muted-foreground/80">Scan a product to begin</p>
+            <p className="mt-4 text-center text-xs text-muted-foreground/90">
+              {customerDisplayName != null ? `Customer: ${customerDisplayName}` : 'No customer'}
+            </p>
           </div>
         ) : (
           <>
-            {/* Cart header */}
-            <div className="px-6 pt-5 pb-4 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm text-muted-foreground uppercase tracking-wider font-semibold">Current Sale</p>
-                <p className="text-sm text-muted-foreground/70 mt-1">{itemCount} item{itemCount !== 1 ? 's' : ''}</p>
+            <div className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-border/40 bg-card/60 px-5 md:px-6">
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground md:text-xs md:tracking-[0.2em]">
+                  Current sale
+                </p>
+                <p className="mt-0.5 text-sm text-foreground">
+                  {itemCount} line{itemCount !== 1 ? 's' : ''}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground/90">
+                  {customerDisplayName != null ? `Customer: ${customerDisplayName}` : 'No customer'}
+                </p>
                 {removeMode && (
-                  <p className="text-xs text-destructive/80 font-medium mt-1.5">Tap a line to remove it from the cart</p>
+                  <p className="mt-1 text-[11px] font-medium text-destructive">Tap a line to remove</p>
                 )}
               </div>
-              <button onClick={onClear} className="text-sm font-medium text-destructive/70 hover:text-destructive px-3 py-2 rounded-lg hover:bg-destructive/10 pos-transition">
+              <button
+                type="button"
+                onClick={onClear}
+                className="shrink-0 rounded-lg px-3 py-2 text-sm font-medium text-destructive/80 hover:bg-destructive/10 hover:text-destructive pos-transition"
+              >
                 Clear
               </button>
             </div>
 
-            {/* Cart items */}
-            <div className="flex-1 overflow-y-auto px-5 space-y-2">
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto px-5 py-3 md:px-6">
               {cart.map((item, idx) => (
-                <div key={item.id} className="bg-secondary/30 rounded-xl px-4 py-3 pos-slide-up" style={{ animationDelay: `${idx * 30}ms` }}>
+                <div
+                  key={item.id}
+                  className="rounded-xl border border-border/50 bg-card px-4 py-3 shadow-sm pos-slide-up"
+                  style={{ animationDelay: `${idx * 30}ms` }}
+                >
                   <div
-                    className={`flex items-center gap-3 rounded-lg -mx-1 px-1 ${removeMode ? 'cursor-pointer hover:bg-destructive/10 pos-transition' : ''}`}
+                    className={`flex items-start gap-3 ${removeMode ? 'cursor-pointer rounded-lg hover:bg-muted/50 pos-transition' : ''}`}
                     onClick={removeMode ? () => onRemove(item.id) : undefined}
                     onKeyDown={
                       removeMode
@@ -463,12 +504,20 @@ export default function ScanScreen({
                   </div>
                   <div className="flex items-center justify-between mt-2.5">
                     <div className="flex items-center gap-1">
-                      <button onClick={() => onUpdateQty(item.id, -1)} className="w-9 h-9 rounded-lg bg-background/50 flex items-center justify-center hover:bg-accent pos-transition active:scale-90">
-                        <Minus className="w-4 h-4" />
+                      <button
+                        type="button"
+                        onClick={() => onUpdateQty(item.id, -1)}
+                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-border/60 bg-background shadow-sm hover:bg-accent pos-transition active:scale-95"
+                      >
+                        <Minus className="h-4 w-4" />
                       </button>
-                      <span className="w-10 text-center text-sm font-bold tabular-nums">{item.quantity}</span>
-                      <button onClick={() => onUpdateQty(item.id, 1)} className="w-9 h-9 rounded-lg bg-background/50 flex items-center justify-center hover:bg-accent pos-transition active:scale-90">
-                        <Plus className="w-4 h-4" />
+                      <span className="min-w-[2.5rem] text-center text-sm font-bold tabular-nums text-foreground">{item.quantity}</span>
+                      <button
+                        type="button"
+                        onClick={() => onUpdateQty(item.id, 1)}
+                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-border/60 bg-background shadow-sm hover:bg-accent pos-transition active:scale-95"
+                      >
+                        <Plus className="h-4 w-4" />
                       </button>
                     </div>
                     <span className="text-base font-bold text-foreground tabular-nums">${(item.product.price * item.quantity).toFixed(2)}</span>
@@ -477,30 +526,25 @@ export default function ScanScreen({
               ))}
             </div>
 
-            {/* Totals + CTA */}
-            <div className="px-6 pt-4 pb-5 border-t border-border/20">
-              <div className="space-y-1.5 mb-4">
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Subtotal</span>
-                  <span className="font-medium tabular-nums">${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Tax (8%)</span>
-                  <span className="font-medium tabular-nums">${tax.toFixed(2)}</span>
-                </div>
+            <div className="shrink-0 border-t border-border/40 bg-card/40 px-5 pb-6 pt-4 md:px-6">
+              <div className="mb-4 grid grid-cols-[1fr_auto] gap-x-6 gap-y-1.5 text-sm">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-right font-medium tabular-nums text-foreground">${subtotal.toFixed(2)}</span>
+                <span className="text-muted-foreground">Tax (8%)</span>
+                <span className="text-right font-medium tabular-nums text-foreground">${tax.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between items-baseline mb-5 gap-4">
-                <span className="text-base font-bold text-muted-foreground uppercase tracking-wide">Total</span>
-                <span className="text-3xl font-extrabold text-primary tabular-nums">${total.toFixed(2)}</span>
+              <div className="mb-5 flex items-end justify-between gap-4 border-t border-border/30 pt-4">
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">Total</span>
+                <span className="text-3xl font-extrabold tabular-nums leading-none text-primary md:text-4xl">${total.toFixed(2)}</span>
               </div>
-              <Button variant="pos" size="pos-xl" className="w-full text-lg" onClick={onCheckout}>
+              <Button variant="pos" size="pos-xl" className="h-14 w-full text-base font-semibold md:h-[3.75rem] md:text-lg" onClick={onCheckout}>
                 Charge ${total.toFixed(2)}
-                <ArrowRight className="w-6 h-6 ml-1" />
+                <ArrowRight className="ml-2 h-5 w-5 md:h-6 md:w-6" />
               </Button>
             </div>
           </>
         )}
-      </div>
+      </aside>
 
       <CameraBarcodeScanDialog open={cameraOpen} onOpenChange={setCameraOpen} onScan={onCameraBarcode} />
 

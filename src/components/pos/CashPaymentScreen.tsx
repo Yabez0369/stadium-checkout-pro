@@ -30,18 +30,22 @@ export default function CashPaymentScreen({ total, onComplete, onBack }: CashPay
   };
 
   return (
-    <div className="flex min-h-0 flex-1 overflow-hidden pos-fade-in">
-      {/* Summary */}
-      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-6 md:overflow-hidden md:px-10">
-        <div className="absolute left-6 top-5 md:left-10 md:top-8">
-          <Button variant="pos-ghost" size="pos-icon" onClick={onBack} className="h-12 w-12 md:h-14 md:w-14 rounded-2xl">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden pos-fade-in">
+      <header className="pos-register-header grid shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 md:px-8 xl:px-10 ipad-pro:px-12">
+        <div className="flex justify-start">
+          <Button variant="pos-ghost" size="pos-icon" onClick={onBack} className="h-11 w-11 rounded-2xl md:h-12 md:w-12">
             <ArrowLeft className="h-5 w-5 md:h-6 md:w-6" />
           </Button>
         </div>
-        <div className="absolute right-6 top-5 md:right-10 md:top-8">
+        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground md:text-xs">Cash</p>
+        <div className="flex justify-end">
           <CustomerDisplayLaunchButton variant="compact" />
         </div>
+      </header>
 
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
+      {/* Summary */}
+      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-6 py-6 md:overflow-hidden md:px-10 md:py-8">
         <p className="mb-1 text-sm uppercase tracking-wider text-muted-foreground md:text-base">Amount Due</p>
         <p className="mb-5 text-4xl font-extrabold text-foreground md:mb-6 md:text-5xl lg:mb-8 lg:text-6xl">${total.toFixed(2)}</p>
 
@@ -59,7 +63,7 @@ export default function CashPaymentScreen({ total, onComplete, onBack }: CashPay
       </div>
 
       {/* Entry */}
-      <div className="flex min-h-0 w-[min(100%,24rem)] shrink-0 flex-col justify-center gap-4 overflow-y-auto border-l border-border/30 bg-card/50 p-5 md:overflow-hidden md:gap-5 md:p-7 md:w-[min(100%,28rem)]">
+      <div className="flex min-h-0 w-full shrink-0 flex-col justify-center gap-4 overflow-y-auto border-t border-border/40 bg-card/60 p-5 md:w-[min(100%,28rem)] md:overflow-hidden md:border-l md:border-t-0 md:gap-5 md:p-7">
         <div>
           <label htmlFor="cash-received" className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-2">
             Customer paid
@@ -107,6 +111,7 @@ export default function CashPaymentScreen({ total, onComplete, onBack }: CashPay
             Confirm
           </Button>
         </div>
+      </div>
       </div>
     </div>
   );

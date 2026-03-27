@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { getCustomerById } from '@/data/customers';
 import type { CartItem, POSScreen, SaleState } from '@/data/posProducts';
 import { getCartTotal } from '@/data/posProducts';
 
@@ -26,6 +27,8 @@ export type CustomerDisplayPayload = {
   paymentState: CustomerDisplayPaymentState;
   tenderMethod: 'cash' | 'card' | 'split' | null;
   transactionId: string;
+  /** Resolved display name when the sale is linked to a customer. */
+  customerName: string | null;
 };
 
 export function mapScreenToCustomerPaymentState(screen: POSScreen): CustomerDisplayPaymentState {
@@ -49,6 +52,9 @@ export function buildCustomerDisplayPayload(
   sale: SaleState,
   screen: POSScreen,
 ): CustomerDisplayPayload {
+  const customerName =
+    sale.customerId != null ? getCustomerById(sale.customerId)?.displayName ?? null : null;
+
   return {
     cart: sale.cart,
     orderDiscount: sale.orderDiscount,
@@ -56,6 +62,7 @@ export function buildCustomerDisplayPayload(
     paymentState: mapScreenToCustomerPaymentState(screen),
     tenderMethod: sale.tenderMethod,
     transactionId: sale.transactionId,
+    customerName,
   };
 }
 
@@ -78,7 +85,12 @@ export function readCustomerDisplaySnapshot(): CustomerDisplayPayload | null {
   try {
     const raw = localStorage.getItem(SNAPSHOT_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as CustomerDisplayPayload;
+    const parsed = JSON.parse(raw) as Partial<CustomerDisplayPayload> & { cart?: unknown };
+    if (!parsed || !Array.isArray(parsed.cart)) return null;
+    return {
+      ...(parsed as CustomerDisplayPayload),
+      customerName: parsed.customerName ?? null,
+    };
   } catch {
     return null;
   }
@@ -107,7 +119,9 @@ export function useCustomerDisplayReceiver(): CustomerDisplayPayload | null {
 
   useEffect(() => {
     const apply = (data: CustomerDisplayPayload | null) => {
-      if (data && typeof data === 'object' && 'cart' in data) setState(data);
+      if (data && typeof data === 'object' && 'cart' in data) {
+        setState({ ...data, customerName: data.customerName ?? null });
+      }
     };
 
     const ch = getChannel();

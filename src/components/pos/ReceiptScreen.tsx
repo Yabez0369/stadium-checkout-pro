@@ -22,10 +22,16 @@ export default function ReceiptScreen({
   const change = tenderMethod === 'cash' ? cashReceived - total : 0;
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto overflow-x-hidden pos-fade-in md:overflow-hidden">
-      <div className="absolute right-6 top-5 z-30 md:right-10 md:top-8">
-        <CustomerDisplayLaunchButton variant="compact" />
-      </div>
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden pos-fade-in">
+      <header className="pos-register-header grid shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 md:px-8 xl:px-10 ipad-pro:px-12">
+        <div aria-hidden className="min-w-0" />
+        <p className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground md:text-xs">Receipt</p>
+        <div className="flex justify-end">
+          <CustomerDisplayLaunchButton variant="compact" />
+        </div>
+      </header>
+
+      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto overflow-x-hidden md:overflow-hidden">
       {/* Ambient backdrop */}
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_-5%,hsl(var(--primary)/0.09),transparent_55%)]"
@@ -134,6 +140,7 @@ export default function ReceiptScreen({
           New Sale
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
+      </div>
       </div>
     </div>
   );

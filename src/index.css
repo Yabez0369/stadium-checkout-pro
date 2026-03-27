@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* iPad / tablet: slightly larger root type so rem-based UI scales up together */
+/* iPad / tablet / iPad Pro: scale rem together; large tablets get one more step */
 @layer base {
   html {
     font-size: 16px;
@@ -18,6 +18,12 @@
   @media (min-width: 1024px) {
     html {
       font-size: 18px;
+    }
+  }
+  /* iPad Pro 12.9" landscape & large tablets */
+  @media (min-width: 1366px) {
+    html {
+      font-size: 19px;
     }
   }
 }
@@ -96,8 +102,14 @@
     touch-action: manipulation;
     user-select: none;
     overflow: hidden;
+    box-sizing: border-box;
     min-height: 100dvh;
     min-height: -webkit-fill-available;
+    /* iPad / iPhone safe areas (notch, home indicator, rounded corners) */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
   }
 }
 
@@ -129,9 +141,23 @@
     @apply min-h-[48px] min-w-[48px] md:min-h-[52px] md:min-w-[52px];
   }
 
-  /** Full viewport shell for POS (iPad: one screen, no page scroll — children use min-h-0 + internal scroll) */
+  /** Register chrome — one height for scan header & cart header (iPad alignment) */
+  .pos-register-header {
+    @apply flex h-16 shrink-0 items-center justify-between gap-4 border-b border-border/40 bg-background/95 backdrop-blur-sm;
+  }
+
+  .pos-cart-rail {
+    @apply flex min-h-0 flex-col border-l border-border/40 bg-muted/25;
+  }
+
+  /** Cart rail top strip — same h-16 + chrome as .pos-register-header for horizontal alignment */
+  .pos-cart-toolbar {
+    @apply flex h-16 shrink-0 items-center border-b border-border/40 bg-background/95 backdrop-blur-sm;
+  }
+
+  /** Full viewport shell for POS (iPad Pro: fills screen; safe-area handled on body) */
   .pos-app-shell {
-    @apply flex h-dvh min-h-0 w-full flex-col overflow-hidden bg-background;
+    @apply flex h-dvh min-h-0 w-full max-w-[100vw] flex-col overflow-hidden bg-background;
   }
 
   .pos-transition {

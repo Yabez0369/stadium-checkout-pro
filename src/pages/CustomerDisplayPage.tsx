@@ -13,6 +13,7 @@ export default function CustomerDisplayPage() {
   const paymentState = live?.paymentState ?? 'scanning';
   const tenderMethod = live?.tenderMethod ?? null;
   const transactionId = live?.transactionId ?? '';
+  const customerName = live?.customerName ?? null;
 
   return (
     <CustomerDisplay
@@ -22,6 +23,7 @@ export default function CustomerDisplayPage() {
       total={total}
       tenderMethod={tenderMethod}
       transactionId={transactionId}
+      customerName={customerName}
       awaitingRegister={!live}
     />
   );

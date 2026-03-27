@@ -39,7 +39,7 @@ export default function Login() {
   return (
     <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-[#070b14] text-white select-text lg:flex-row">
       {/* Brand panel */}
-      <div className="relative flex min-h-[200px] shrink-0 flex-col justify-between overflow-hidden px-8 py-8 md:min-h-[min(28vh,11rem)] md:py-7 lg:min-h-screen lg:w-[46%] lg:px-14 lg:py-16">
+      <div className="relative flex min-h-[200px] shrink-0 flex-col justify-start overflow-hidden px-8 py-8 md:min-h-[min(28vh,11rem)] md:py-7 lg:min-h-screen lg:w-[46%] lg:px-14 lg:py-16">
         <div
           className="pointer-events-none absolute inset-0 opacity-90"
           style={{
@@ -67,26 +67,13 @@ export default function Login() {
             Point of sale access — sign in with your credentials for a fast, secure checkout.
           </p>
         </div>
-
-        <div className="relative z-10 hidden lg:block">
-          <div className="flex gap-8 border-t border-white/10 pt-8">
-            <div>
-              <p className="text-2xl font-bold tabular-nums text-white">24/7</p>
-              <p className="text-xs font-medium uppercase tracking-wider text-white/40 mt-1">Operations</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold tabular-nums text-white">PCI</p>
-              <p className="text-xs font-medium uppercase tracking-wider text-white/40 mt-1">Ready stack</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Form panel */}
-      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto bg-background px-5 py-6 sm:px-8 md:overflow-hidden md:py-5 lg:rounded-tl-[2.5rem] lg:shadow-[-24px_0_80px_-20px_rgba(0,0,0,0.45)] lg:py-10 text-foreground">
+      <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto bg-background px-5 py-6 sm:px-8 md:overflow-hidden md:py-5 lg:rounded-tl-[2.5rem] lg:shadow-[-24px_0_80px_-20px_rgba(0,0,0,0.45)] lg:py-10 xl:px-12 text-foreground">
         <div className="absolute inset-0 bg-[linear-gradient(180deg,hsl(var(--muted)/0.35)_0%,transparent_35%)] pointer-events-none lg:rounded-tl-[2.5rem]" />
 
-        <div className="relative w-full max-w-[420px] md:max-w-[480px] lg:max-w-[520px]">
+        <div className="relative w-full max-w-[420px] md:max-w-[480px] lg:max-w-[520px] xl:max-w-[560px] ipad-pro:max-w-[600px]">
           <div className="mb-6 lg:hidden md:mb-5">
             <p className="text-2xl font-extrabold tracking-tight text-foreground">
               <span className="text-foreground">SCS</span>

@@ -3,6 +3,14 @@ import {
   POSScreen, SaleState, CartItem, Product,
   createEmptySale, generateTransactionId, getCartTotal,
 } from '@/data/posProducts';
+import { getCustomerById } from '@/data/customers';
+import {
+  getParkedSaleById,
+  getParkedSalesCount,
+  parkSale as saveParkedSale,
+  removeParkedSale,
+  type ParkSaleResult,
+} from '@/data/parkedSales';
 import { useCustomerDisplayBroadcast } from '@/lib/customerDisplaySync';
 
 import ScanScreen from './ScanScreen';
@@ -84,6 +92,43 @@ export default function POSTerminal() {
     setScreen('scanning');
   }, []);
 
+  const attachCustomer = useCallback((customerId: string | null) => {
+    if (customerId !== null && !getCustomerById(customerId)) return;
+    updateSale({ customerId });
+  }, [updateSale]);
+
+  const clearCustomer = useCallback(() => {
+    updateSale({ customerId: null });
+  }, [updateSale]);
+
+  const parkCurrentSale = useCallback((): ParkSaleResult => {
+    let out: ParkSaleResult = { ok: false, reason: 'max_reached' };
+    setSale(prev => {
+      out = saveParkedSale({
+        cart: prev.cart,
+        orderDiscount: prev.orderDiscount,
+        customerId: prev.customerId,
+      });
+      if (out.ok) return createEmptySale();
+      return prev;
+    });
+    return out;
+  }, []);
+
+  const recallParkedSale = useCallback((parkedId: string) => {
+    const parked = getParkedSaleById(parkedId);
+    if (!parked) return;
+    const snap = parked.saleSnapshot;
+    setSale({
+      ...createEmptySale(),
+      cart: snap.cart,
+      orderDiscount: snap.orderDiscount,
+      customerId: snap.customerId,
+    });
+    removeParkedSale(parkedId);
+    setScreen('scanning');
+  }, []);
+
   const total = getCartTotal(sale.cart, sale.orderDiscount);
 
   useCustomerDisplayBroadcast(sale, screen);
@@ -94,12 +139,18 @@ export default function POSTerminal() {
         <ScanScreen
           cart={sale.cart}
           orderDiscount={sale.orderDiscount}
+          customerId={sale.customerId}
+          parkedCount={getParkedSalesCount()}
           onAddProduct={addProduct}
           onRemoveProductFromCart={removeProductFromCart}
           onUpdateQty={updateQty}
           onRemove={removeItem}
           onClear={clearCart}
           onCheckout={() => setScreen('tender')}
+          onAttachCustomer={attachCustomer}
+          onClearCustomer={clearCustomer}
+          onParkSale={parkCurrentSale}
+          onRecallParkedSale={recallParkedSale}
         />
       </div>
     );
